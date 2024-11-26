@@ -990,6 +990,12 @@ export const UnifiedDataTable = ({
   const showDisplaySelector = useMemo(():
     | EuiDataGridToolBarVisibilityDisplaySelectorOptions
     | undefined => {
+    console.log({
+      onUpdateDataGridDensity,
+      onUpdateRowHeight,
+      onUpdateHeaderRowHeight,
+      onUpdateSampleSize,
+    });
     if (
       !onUpdateDataGridDensity &&
       !onUpdateRowHeight &&
@@ -1038,7 +1044,7 @@ export const UnifiedDataTable = ({
     sampleSizeState,
     onUpdateDataGridDensity,
   ]);
-
+  console.log({ showDisplaySelector });
   const toolbarVisibility = useMemo(
     () =>
       defaultColumns
@@ -1102,7 +1108,6 @@ export const UnifiedDataTable = ({
       </div>
     );
   }
-
   return (
     <UnifiedDataTableContext.Provider value={unifiedDataTableContextValue}>
       <span className="unifiedDataTable__inner">

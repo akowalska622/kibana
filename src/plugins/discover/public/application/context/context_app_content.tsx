@@ -109,10 +109,13 @@ export function ContextAppContent({
   setAppState,
   addFilter,
 }: ContextAppContentProps) {
-  const { uiSettings: config, uiActions } = useDiscoverServices();
   const services = useDiscoverServices();
+  const { uiSettings, uiActions } = services;
+
+  const configRowHeight = uiSettings.get(ROW_HEIGHT_OPTION);
 
   const [expandedDoc, setExpandedDoc] = useState<DataTableRecord | undefined>();
+  const [rowHeight, setRowHeight] = useState<number>(configRowHeight);
   const isAnchorLoading =
     anchorStatus === LoadingStatus.LOADING || anchorStatus === LoadingStatus.UNINITIALIZED;
   const arePredecessorsLoading =
@@ -122,10 +125,13 @@ export function ContextAppContent({
     successorsStatus === LoadingStatus.LOADING || successorsStatus === LoadingStatus.UNINITIALIZED;
 
   const showTimeCol = useMemo(
-    () => !config.get(DOC_HIDE_TIME_COLUMN_SETTING, false) && !!dataView.timeFieldName,
-    [config, dataView]
+    () => !uiSettings.get(DOC_HIDE_TIME_COLUMN_SETTING, false) && !!dataView.timeFieldName,
+    [uiSettings, dataView]
   );
-  const defaultStepSize = useMemo(() => parseInt(config.get(CONTEXT_STEP_SETTING), 10), [config]);
+  const defaultStepSize = useMemo(
+    () => parseInt(uiSettings.get(CONTEXT_STEP_SETTING), 10),
+    [uiSettings]
+  );
 
   const loadingFeedback = () => {
     if (isLegacy && isAnchorLoading) {
@@ -175,7 +181,6 @@ export function ContextAppContent({
     [grid, setAppState]
   );
 
-  const configRowHeight = services.uiSettings.get(ROW_HEIGHT_OPTION);
   const getCellRenderersAccessor = useProfileAccessor('getCellRenderers');
   const cellRenderers = useMemo(() => {
     const getCellRenderers = getCellRenderersAccessor(() => ({}));
@@ -205,6 +210,14 @@ export function ContextAppContent({
     filters,
     timeRange,
   });
+
+  const onUpdateRowHeight = useCallback((newRowHeight: number) => {
+    setRowHeight(newRowHeight);
+  }, []);
+
+  const onUpdateHeaderRowHeight = useCallback((newHeaderRowHeight: number) => {
+    // todo
+  }, []);
 
   return (
     <Fragment>
@@ -259,20 +272,22 @@ export function ContextAppContent({
               showTimeCol={showTimeCol}
               useNewFieldsApi={useNewFieldsApi}
               isPaginationEnabled={false}
-              rowsPerPageState={getDefaultRowsPerPage(services.uiSettings)}
+              rowsPerPageState={getDefaultRowsPerPage(uiSettings)}
               controlColumnIds={controlColumnIds}
               setExpandedDoc={setExpandedDoc}
               onFilter={addFilter}
               onSetColumns={onSetColumns}
-              configRowHeight={configRowHeight}
-              showMultiFields={services.uiSettings.get(SHOW_MULTIFIELDS)}
-              maxDocFieldsDisplayed={services.uiSettings.get(MAX_DOC_FIELDS_DISPLAYED)}
+              configRowHeight={rowHeight}
+              showMultiFields={uiSettings.get(SHOW_MULTIFIELDS)}
+              maxDocFieldsDisplayed={uiSettings.get(MAX_DOC_FIELDS_DISPLAYED)}
               renderDocumentView={renderDocumentView}
               services={services}
               configHeaderRowHeight={3}
               settings={grid}
               onResize={onResize}
               externalCustomRenderers={cellRenderers}
+              onUpdateRowHeight={onUpdateRowHeight}
+              onUpdateHeaderRowHeight={onUpdateHeaderRowHeight}
             />
           </CellActionsProvider>
         </div>
