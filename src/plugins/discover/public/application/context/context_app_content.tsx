@@ -116,6 +116,7 @@ export function ContextAppContent({
 
   const [expandedDoc, setExpandedDoc] = useState<DataTableRecord | undefined>();
   const [rowHeight, setRowHeight] = useState<number>(configRowHeight);
+
   const isAnchorLoading =
     anchorStatus === LoadingStatus.LOADING || anchorStatus === LoadingStatus.UNINITIALIZED;
   const arePredecessorsLoading =
@@ -191,10 +192,11 @@ export function ContextAppContent({
       rowHeight: getRowHeight({
         storage: services.storage,
         consumer: 'discover',
+        rowHeightState: rowHeight,
         configRowHeight,
       }),
     });
-  }, [addFilter, configRowHeight, dataView, getCellRenderersAccessor, services.storage]);
+  }, [addFilter, configRowHeight, dataView, getCellRenderersAccessor, services.storage, rowHeight]);
 
   const dataSource = useMemo(() => createDataSource({ dataView, query: undefined }), [dataView]);
   const { filters } = useQuerySubscriber({ data: services.data });
@@ -287,7 +289,7 @@ export function ContextAppContent({
               onResize={onResize}
               externalCustomRenderers={cellRenderers}
               onUpdateRowHeight={onUpdateRowHeight}
-              onUpdateHeaderRowHeight={onUpdateHeaderRowHeight}
+              // onUpdateHeaderRowHeight={onUpdateHeaderRowHeight}
             />
           </CellActionsProvider>
         </div>

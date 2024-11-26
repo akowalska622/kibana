@@ -63,7 +63,7 @@ export function RowHeightSettings({
       'data-test-subj': `${dataTestSubj}_rowHeight_${RowHeightMode.custom}`,
     },
   ];
-
+  console.log({ label, rowHeight });
   return (
     <>
       <EuiFormRow label={label} display="columnCompressed" data-test-subj={dataTestSubj}>
