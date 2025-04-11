@@ -124,7 +124,24 @@ export const TabbedContent: React.FC<TabbedContentProps> = ({
       maxItemsCount,
       onDuplicate: (item) => {
         const newItem = createItem();
-        newItem.label = `${item.label} (copy)`;
+        const baseLabel = item.label.includes('(copy)')
+          ? item.label.replace(/\s*\(copy\)( \d+)?$/, '')
+          : item.label;
+
+        // Find all existing copies to determine next number
+        const copyRegex = new RegExp(`^${baseLabel}\\s*\\(copy\\)( \\d+)?$`);
+        const copies = state.items
+          .filter((tab) => copyRegex.test(tab.label))
+          .map((tab) => {
+            const match = tab.label.match(/\(copy\)( (\d+))?$/);
+            return match && match[2] ? Number(match[2]) : 1; // match[2] is the number after (copy)
+          });
+
+        // Determine the next copy number
+        const nextNumber = copies.length > 0 ? Math.max(...copies) + 1 : null;
+
+        newItem.label = nextNumber ? `${baseLabel} (copy) ${nextNumber}` : `${baseLabel} (copy)`;
+
         changeState((prevState) => insertTabAfter(prevState, newItem, item, maxItemsCount));
       },
       onCloseOtherTabs: (item) => changeState((prevState) => closeOtherTabs(prevState, item)),
