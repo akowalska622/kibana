@@ -66,7 +66,8 @@ export const SideNavPopover = ({
     persistent,
     isPersistent,
     isSidePanelOpen,
-    { open, close: handleClose }
+    { open, close: handleClose },
+    { triggerRef, popoverRef }
   );
 
   const handleTriggerClick = useCallback(() => {
