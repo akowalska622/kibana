@@ -48,6 +48,7 @@ interface SavedSearchEmbeddableComponentProps {
   onAddFilter?: DocViewFilterFn;
   enableDocumentViewer: boolean;
   stateManager: SearchEmbeddableStateManager;
+  onFetchMoreRecords?: () => void;
 }
 
 const DiscoverGridEmbeddableMemoized = React.memo(DiscoverGridEmbeddable);
@@ -58,6 +59,7 @@ export function SearchEmbeddableGridComponent({
   onAddFilter,
   enableDocumentViewer,
   stateManager,
+  onFetchMoreRecords,
 }: SavedSearchEmbeddableComponentProps) {
   const discoverServices = useDiscoverServices();
   const esqlVariables$ = apiPublishesESQLVariables(api.parentApi)
@@ -83,6 +85,7 @@ export function SearchEmbeddableGridComponent({
     savedSearchTitle,
     savedSearchDescription,
     esqlVariables,
+    isMoreDataLoading,
   ] = useBatchedPublishingSubjects(
     api.dataLoading$,
     api.savedSearch$,
@@ -99,7 +102,8 @@ export function SearchEmbeddableGridComponent({
     api.description$,
     api.defaultTitle$,
     api.defaultDescription$,
-    esqlVariables$ ?? emptyEsqlVariables$
+    esqlVariables$ ?? emptyEsqlVariables$,
+    stateManager.isMoreDataLoading
   );
 
   // `api.query$` and `api.filters$` are the initial values from the saved search SO (as of now)
@@ -258,6 +262,8 @@ export function SearchEmbeddableGridComponent({
       showTimeCol={!discoverServices.uiSettings.get(DOC_HIDE_TIME_COLUMN_SETTING, false)}
       dataGridDensityState={savedSearch.density}
       enableDocumentViewer={enableDocumentViewer}
+      isMoreDataLoading={isMoreDataLoading}
+      onFetchMoreRecords={onFetchMoreRecords}
     />
   );
 }

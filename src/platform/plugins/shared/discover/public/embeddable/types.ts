@@ -55,6 +55,7 @@ export type SearchEmbeddablePublicState = Pick<
   columnsMeta: DataTableColumnsMeta | undefined;
   totalHitCount: number | undefined;
   inspectorAdapters: Record<string, unknown>;
+  isMoreDataLoading: boolean;
 };
 
 export type SearchEmbeddableStateManager = {

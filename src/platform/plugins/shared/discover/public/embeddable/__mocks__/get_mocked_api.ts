@@ -61,6 +61,7 @@ export const getMockedSearchApi = ({
       totalHitCount: new BehaviorSubject<number | undefined>(0),
       columnsMeta: new BehaviorSubject<Record<string, DatatableColumnMeta> | undefined>(undefined),
       inspectorAdapters: new BehaviorSubject<Adapters>({}),
+      isMoreDataLoading: new BehaviorSubject<boolean>(false),
     },
     setters: {
       setDataLoading: (dataLoading: boolean | undefined) => dataLoading$.next(dataLoading),

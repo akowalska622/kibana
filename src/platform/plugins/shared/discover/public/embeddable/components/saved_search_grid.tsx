@@ -37,12 +37,20 @@ interface DiscoverGridEmbeddableProps extends Omit<UnifiedDataTableProps, 'sampl
   onRemoveColumn: (column: string) => void;
   savedSearchId?: string;
   enableDocumentViewer: boolean;
+  isMoreDataLoading?: boolean;
+  onFetchMoreRecords?: () => void;
 }
 
 export const DiscoverGridMemoized = React.memo(DiscoverGrid);
 
 export function DiscoverGridEmbeddable(props: DiscoverGridEmbeddableProps) {
-  const { interceptedWarnings, enableDocumentViewer, ...gridProps } = props;
+  const {
+    interceptedWarnings,
+    enableDocumentViewer,
+    isMoreDataLoading,
+    onFetchMoreRecords,
+    ...gridProps
+  } = props;
 
   const [expandedDoc, setExpandedDoc] = useState<DataTableRecord | undefined>(undefined);
   const [initialTabId, setInitialTabId] = useState<string | undefined>(undefined);
@@ -137,7 +145,9 @@ export function DiscoverGridEmbeddable(props: DiscoverGridEmbeddableProps) {
   return (
     <SavedSearchEmbeddableBase
       totalHitCount={undefined} // it will be rendered inside the custom grid toolbar instead
-      isLoading={props.loadingState === DiscoverGridLoadingState.loading}
+      isLoading={
+        props.loadingState === DiscoverGridLoadingState.loading || (isMoreDataLoading ?? false)
+      }
       dataTestSubj="embeddedSavedSearchDocTable"
       interceptedWarnings={props.interceptedWarnings}
     >
@@ -156,6 +166,7 @@ export function DiscoverGridEmbeddable(props: DiscoverGridEmbeddableProps) {
         showColumnTokens
         showFullScreenButton={false}
         className="unifiedDataTable"
+        onFetchMoreRecords={onFetchMoreRecords}
       />
     </SavedSearchEmbeddableBase>
   );

@@ -8,7 +8,15 @@
  */
 
 import type { BehaviorSubject } from 'rxjs';
-import { combineLatest, distinctUntilChanged, lastValueFrom, map, switchMap, tap } from 'rxjs';
+import {
+  combineLatest,
+  distinctUntilChanged,
+  lastValueFrom,
+  map,
+  Subject,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import type { KibanaExecutionContext } from '@kbn/core/types';
 import {
@@ -145,6 +153,8 @@ export function initializeFetch({
 }) {
   const inspectorAdapters = { requests: new RequestAdapter() };
   let abortController: AbortController | undefined;
+  let abortControllerFetchMore: AbortController | undefined;
+  const fetchMore$ = new Subject<void>();
 
   const rawESQLVariables$ = apiPublishesESQLVariables(api.parentApi)
     ? api.parentApi.esqlVariables$
@@ -312,7 +322,94 @@ export function initializeFetch({
       }
     });
 
-  return () => {
+  // Handle fetch more requests
+  const fetchMoreSubscription = fetchMore$
+    .pipe(
+      switchMap(async () => {
+        const savedSearch = api.savedSearch$.getValue();
+        const dataViews = api.dataViews$.getValue();
+        const dataView = dataViews?.length ? dataViews[0] : undefined;
+        const isAggregatedViewMode = savedSearch.viewMode === VIEW_MODE.AGGREGATED_LEVEL;
+        const isEsql = isEsqlMode(savedSearch);
+
+        if (!dataView || !savedSearch.searchSource || isAggregatedViewMode || isEsql) {
+          return;
+        }
+
+        const currentRows = stateManager.rows.getValue();
+        const lastDocument = currentRows[currentRows.length - 1];
+        const lastDocumentSort = lastDocument?.raw?.sort;
+
+        if (!lastDocumentSort || !currentRows.length) {
+          return;
+        }
+
+        try {
+          stateManager.isMoreDataLoading.next(true);
+
+          // Create a child search source with search_after
+          const searchSource = savedSearch.searchSource.createCopy();
+          searchSource.setField('searchAfter', lastDocumentSort);
+
+          // Get new abort controller for fetch more
+          const currentAbortController = new AbortController();
+          abortControllerFetchMore = currentAbortController;
+
+          const executionContext = await getExecutionContext(api, discoverServices);
+
+          const { rawResponse: resp } = await lastValueFrom(
+            searchSource.fetch$({
+              abortSignal: currentAbortController.signal,
+              sessionId: api.fetchContext$.getValue()?.searchSessionId,
+              inspector: {
+                adapter: inspectorAdapters.requests,
+                title: i18n.translate('discover.embeddable.inspectorTableRequestTitle', {
+                  defaultMessage: 'Table',
+                }),
+                description: i18n.translate('discover.embeddable.inspectorRequestDescription', {
+                  defaultMessage:
+                    'This request queries Elasticsearch to fetch the data for the search.',
+                }),
+              },
+              executionContext,
+              disableWarningToasts: true,
+            })
+          );
+
+          const moreRows = buildDataTableRecordList({
+            records: resp.hits.hits,
+            dataView,
+            processRecord: (record) => scopedProfilesManager.resolveDocumentProfile({ record }),
+          });
+
+          // Append new rows to existing rows
+          stateManager.rows.next([...currentRows, ...moreRows]);
+          stateManager.isMoreDataLoading.next(false);
+        } catch (error) {
+          stateManager.isMoreDataLoading.next(false);
+          // Silently fail for now - could add error handling if needed
+        }
+      })
+    )
+    .subscribe();
+
+  const fetchMore = () => {
+    fetchMore$.next();
+  };
+
+  const cleanup = () => {
     fetchSubscription.unsubscribe();
+    fetchMoreSubscription.unsubscribe();
+    if (abortController) {
+      abortController.abort();
+    }
+    if (abortControllerFetchMore) {
+      abortControllerFetchMore.abort();
+    }
+  };
+
+  return {
+    fetchMore,
+    cleanup,
   };
 }

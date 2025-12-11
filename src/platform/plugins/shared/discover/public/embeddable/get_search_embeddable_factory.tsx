@@ -221,7 +221,7 @@ export const getSearchEmbeddableFactory = ({
         },
       });
 
-      const unsubscribeFromFetch = initializeFetch({
+      const fetchApi = initializeFetch({
         api: {
           ...api,
           parentApi,
@@ -254,7 +254,7 @@ export const getSearchEmbeddableFactory = ({
           useEffect(() => {
             return () => {
               searchEmbeddable.cleanup();
-              unsubscribeFromFetch();
+              fetchApi.cleanup();
               maybeStopDynamicActions?.stopDynamicActions();
             };
           }, []);
@@ -361,6 +361,7 @@ export const getSearchEmbeddableFactory = ({
                               : true
                           }
                           stateManager={searchEmbeddable.stateManager}
+                          onFetchMoreRecords={fetchApi.fetchMore}
                         />
                       </CellActionsProvider>
                     )}
