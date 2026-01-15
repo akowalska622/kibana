@@ -31,7 +31,7 @@ import type { DataTableRecord, DataTableColumnsMeta } from '@kbn/discover-utils/
 import useLocalStorage from 'react-use/lib/useLocalStorage';
 import type { ToastsStart } from '@kbn/core-notifications-browser';
 import type { DocViewFilterFn, DocViewRenderProps } from '@kbn/unified-doc-viewer/types';
-import type { DocViewerProps } from '@kbn/unified-doc-viewer';
+import type { DocViewerProps, DocViewerRestorableState } from '@kbn/unified-doc-viewer';
 import { UnifiedDocViewer } from '../lazy_doc_viewer';
 import { useFlyoutA11y } from './use_flyout_a11y';
 
@@ -66,7 +66,10 @@ export interface UnifiedDocViewerFlyoutProps
   onClose: () => void;
   onFilter?: DocViewFilterFn;
   onRemoveColumn: (column: string) => void;
-  setExpandedDoc: (doc?: DataTableRecord) => void;
+  setExpandedDoc: (
+    doc?: DataTableRecord,
+    options?: { initialTabId?: string; initialTabState?: DocViewerRestorableState }
+  ) => void;
   initialTabId?: string;
 }
 

@@ -27,6 +27,7 @@ import { dismissFlyouts, DiscoverFlyouts } from '@kbn/discover-utils';
 import type { IKbnUrlStateStorage } from '@kbn/kibana-utils-plugin/public';
 import type { ESQLControlVariable } from '@kbn/esql-types';
 import type { DiscoverSession } from '@kbn/saved-search-plugin/common';
+import type { DocViewerRestorableState } from '@kbn/unified-doc-viewer';
 import { isOfAggregateQueryType } from '@kbn/es-query';
 import type { DiscoverCustomizationContext } from '../../../../customizations';
 import type { DiscoverServices } from '../../../../build_services';
@@ -167,6 +168,7 @@ export const internalStateSlice = createSlice({
       action: TabAction<{
         expandedDoc: DataTableRecord | undefined;
         initialDocViewerTabId?: string;
+        initialTabState?: Partial<DocViewerRestorableState>;
       }>
     ) => {
       withTab(state, action.payload, (tab) => {
@@ -178,6 +180,13 @@ export const internalStateSlice = createSlice({
 
         tab.expandedDoc = action.payload.expandedDoc;
         tab.initialDocViewerTabId = action.payload.initialDocViewerTabId;
+
+        if (action.payload.initialTabState) {
+          tab.uiState.docViewer = {
+            ...tab.uiState.docViewer,
+            ...action.payload.initialTabState,
+          };
+        }
       });
     },
 
