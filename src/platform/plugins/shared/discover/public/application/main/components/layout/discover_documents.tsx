@@ -9,6 +9,8 @@
 
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import {
+  EuiButton,
+  EuiFlexGroup,
   EuiFlexItem,
   EuiLoadingSpinner,
   EuiProgress,
@@ -470,10 +472,39 @@ function DiscoverDocumentsComponent({
     [isDataLoading, styles.progress]
   );
 
+  // Demo button to test initial state feature
+  const demoInitialStateButton = useMemo(() => {
+    if (!rows.length) return null;
+
+    return (
+      <EuiButton
+        size="s"
+        color="accent"
+        iconType="beaker"
+        onClick={() => {
+          const firstDoc = rows[0];
+          setExpandedDoc(firstDoc, {
+            initialTabId: 'test',
+            initialTabState: { count: 42 },
+          });
+        }}
+      >
+        Demo: Open with Initial State (count: 42)
+      </EuiButton>
+    );
+  }, [rows, setExpandedDoc]);
+
   const renderCustomToolbarWithElements = useMemo(
     () =>
       getRenderCustomToolbarWithElements({
-        leftSide: isDataGridFullScreen ? undefined : viewModeToggle,
+        leftSide: isDataGridFullScreen ? undefined : (
+          <EuiFlexGroup gutterSize="s" alignItems="center" responsive={false}>
+            {viewModeToggle && <EuiFlexItem grow={false}>{viewModeToggle}</EuiFlexItem>}
+            {demoInitialStateButton && (
+              <EuiFlexItem grow={false}>{demoInitialStateButton}</EuiFlexItem>
+            )}
+          </EuiFlexGroup>
+        ),
         bottomSection: (
           <>
             {callouts}
@@ -481,7 +512,7 @@ function DiscoverDocumentsComponent({
           </>
         ),
       }),
-    [viewModeToggle, callouts, loadingIndicator, isDataGridFullScreen]
+    [viewModeToggle, callouts, loadingIndicator, isDataGridFullScreen, demoInitialStateButton]
   );
 
   if (isDataViewLoading || (isEmptyDataResult && isDataLoading)) {

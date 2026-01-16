@@ -11,8 +11,9 @@ import React from 'react';
 import type { CoreSetup, Plugin } from '@kbn/core/public';
 import { i18n } from '@kbn/i18n';
 import { DocViewsRegistry } from '@kbn/unified-doc-viewer';
-import { EuiDelayRender, EuiSkeletonText } from '@elastic/eui';
+import { EuiButton, EuiDelayRender, EuiSkeletonText, EuiSpacer } from '@elastic/eui';
 import { createGetterSetter, Storage } from '@kbn/kibana-utils-plugin/public';
+import { createRestorableStateProvider } from '@kbn/restorable-state';
 import type { DataPublicPluginStart } from '@kbn/data-plugin/public';
 import type { FieldFormatsStart } from '@kbn/field-formats-plugin/public';
 import type { CoreStart } from '@kbn/core/public';
@@ -88,6 +89,36 @@ export class UnifiedDocViewerPublicPlugin
           />
         );
       },
+    });
+
+    // Example doc view tab with restorable state for testing
+    interface TestDocViewRestorableState {
+      count: number;
+    }
+
+    const { withRestorableState, useRestorableState } =
+      createRestorableStateProvider<TestDocViewRestorableState>();
+
+    const Test = withRestorableState(() => {
+      const [count, setCount] = useRestorableState('count', 0);
+      return (
+        <>
+          <EuiSpacer size="s" />
+          <div>Count: {count}</div>
+          <EuiSpacer size="s" />
+          <EuiButton color="text" size="s" onClick={() => setCount(count + 1)}>
+            Increment
+          </EuiButton>
+          <EuiSpacer size="s" />
+        </>
+      );
+    });
+
+    this.docViewsRegistry.add({
+      id: 'test',
+      title: 'Test',
+      order: 30,
+      render: (props) => <Test {...props} />,
     });
 
     return {
