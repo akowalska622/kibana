@@ -19,7 +19,6 @@ import { DashboardLinks } from './dashboard_links';
 import { DataViewEditorPage } from './data_view_editor_page';
 import { DatePicker } from './date_picker';
 import { DiscoverApp } from './discover_app';
-import { DocViewer } from './doc_viewer';
 import { FilterBar } from './filter_bar';
 import { MapsPage } from './maps_page';
 import { QueryBar } from './query_bar';
@@ -49,7 +48,6 @@ export {
   ContentListWrapper,
   CopySavedObjectsToSpaceFlyout,
   DataGrid,
-  DocViewer,
   DataViewsManagementPage,
   ListingTable,
   SavedObjectsManagementPage,
@@ -70,7 +68,6 @@ export interface PageObjects {
   dataGrid: DataGrid;
   dataViewsManagement: DataViewsManagementPage;
   discover: DiscoverApp;
-  docViewer: DocViewer;
   dashboard: DashboardApp;
   dashboardLinks: DashboardLinks;
   dataViewEditor: DataViewEditorPage;
@@ -109,7 +106,6 @@ export function createCorePageObjects(fixtures: PageObjectsFixtures): PageObject
     dashboard: createLazyPageObject(DashboardApp, fixtures.page),
     dashboardLinks: createLazyPageObject(DashboardLinks, fixtures.page),
     discover: createLazyPageObject(DiscoverApp, fixtures.page),
-    docViewer: createLazyPageObject(DocViewer, fixtures.page),
     filterBar: createLazyPageObject(FilterBar, fixtures.page),
     listingTable: createLazyPageObject(ListingTable, fixtures.page),
     home: createLazyPageObject(HomePage, fixtures.page),

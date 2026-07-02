@@ -47,6 +47,7 @@ export * from './src/playwright/ui_components';
 export {
   ContentListWrapper,
   CopySavedObjectsToSpaceFlyout,
+  DataGrid,
   buildContentListSearch,
   buildContentListUrlRegex,
   ListingTable,

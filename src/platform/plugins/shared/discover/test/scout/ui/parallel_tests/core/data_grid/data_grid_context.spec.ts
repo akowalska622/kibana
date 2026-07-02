@@ -13,7 +13,7 @@
 
 import type { PageObjects, ScoutPage } from '@kbn/scout';
 import { expect } from '@kbn/scout/ui';
-import { spaceTest } from '@kbn/scout';
+import { spaceTest, type DiscoverPageObjects } from '../../../fixtures';
 import { testData } from '../../../fixtures/common';
 
 const CONTEXT_COLUMN = '@message';
@@ -55,7 +55,10 @@ const getColumnTitles = async (page: ScoutPage): Promise<string[]> => {
 
 const normalizeTimestamp = (timestamp: string) => timestamp.replace('↦', '').trim();
 
-const openAnchorDocumentDetails = async (page: ScoutPage, docViewer: PageObjects['docViewer']) => {
+const openAnchorDocumentDetails = async (
+  page: ScoutPage,
+  docViewer: DiscoverPageObjects['docViewer']
+) => {
   const expandButton = page.testSubj.locator('docTableExpandToggleColumnAnchor');
   await expect(expandButton).toBeVisible();
   await expandButton.scrollIntoViewIfNeeded();
