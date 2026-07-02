@@ -1,0 +1,36 @@
+/*
+ * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+ * or more contributor license agreements. Licensed under the Elastic License
+ * 2.0; you may not use this file except in compliance with the Elastic License
+ * 2.0.
+ */
+
+import type { PageObjects, ScoutTestFixtures, ScoutWorkerFixtures } from '@kbn/scout';
+import { createLazyPageObject, test as scoutTest } from '@kbn/scout';
+import { DocViewer } from '@kbn/discover-plugin/test/scout/ui/fixtures/page_objects';
+
+export interface ReleaseTestingPageObjects extends PageObjects {
+  docViewer: DocViewer;
+}
+
+export interface ReleaseTestingTestFixtures extends ScoutTestFixtures {
+  pageObjects: ReleaseTestingPageObjects;
+}
+
+export const test = scoutTest.extend<ReleaseTestingTestFixtures, ScoutWorkerFixtures>({
+  pageObjects: async (
+    {
+      pageObjects,
+      page,
+    }: {
+      pageObjects: ReleaseTestingTestFixtures['pageObjects'];
+      page: ReleaseTestingTestFixtures['page'];
+    },
+    use: (pageObjects: ReleaseTestingTestFixtures['pageObjects']) => Promise<void>
+  ) => {
+    await use({
+      ...pageObjects,
+      docViewer: createLazyPageObject(DocViewer, page),
+    });
+  },
+});

@@ -11,8 +11,9 @@
  * Discover data-grid cell-expand popover + row-toggle flyout behaviours.
  */
 
-import { spaceTest, tags } from '@kbn/scout';
+import { tags } from '@kbn/scout';
 import { expect } from '@kbn/scout/ui';
+import { spaceTest } from '../../../fixtures';
 import { testData } from '../../../fixtures/common';
 
 const EXPECTED_FIRST_ROW_TIMESTAMP = 'Sep 22, 2015 @ 23:50:13.253';
