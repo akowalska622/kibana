@@ -13,7 +13,7 @@
 
 import type { PageObjects, ScoutPage } from '@kbn/scout';
 import { expect } from '@kbn/scout/ui';
-import { spaceTest } from '@kbn/scout';
+import { spaceTest } from '../../../fixtures';
 import { testData } from '../../../fixtures/common';
 
 const CONTEXT_COLUMN = '@message';

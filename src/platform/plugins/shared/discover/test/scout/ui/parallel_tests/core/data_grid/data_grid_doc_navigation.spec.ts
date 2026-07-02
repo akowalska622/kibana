@@ -12,7 +12,7 @@
  */
 
 import { expect } from '@kbn/scout/ui';
-import { spaceTest } from '@kbn/scout';
+import { spaceTest } from '../../../fixtures';
 import { testData } from '../../../fixtures/common';
 
 spaceTest.describe(
